@@ -1,10 +1,18 @@
 ﻿using CoinTradeDataMaker.Core.Model;
 
-using System.Linq.Expressions;
 
 namespace CoinTradeDataMaker.Core.API;
+
 public class UpBitAPI
 {
+	public UpBitAPI(string accKey, string secKey)
+	{
+		AccKey = accKey;
+		SecKey = secKey;
+	}
+
+	#region Properties
+
 	/// <summary>
 	/// Upbit Open API Access Key
 	/// </summary>
@@ -15,26 +23,25 @@ public class UpBitAPI
 	/// </summary>
 	private string SecKey;
 
-	public UpBitAPI(string accKey, string secKey)
-	{
-		AccKey = accKey;
-		SecKey = secKey;
-	}
+	#endregion
 
+	#region API Method
+
+	/// <summary>
+	/// Upbit 서버와의 연결이 유효한지 검사합니다.
+	/// </summary>
+	/// <returns> 연결시도 후 결과 반환 </returns>
 	public bool ConnectionTest()
 	{
 		var response = ExecuteResponse(UpBitURL.ApiKeys);
-
-		if (response != null)
-		{
-			return response.IsSuccessStatusCode;
-		}
-		else
-		{
-			return false;
-		}
+		return response != null ? response.IsSuccessful : false;
 	}
 
+	/// <summary>
+	/// URL을 사용하여 필요한 정보를 담은 객체를 가져옵니다.
+	/// </summary>
+	/// <param name="url"> API 접속 URL </param>
+	/// <returns> 서버와 통신하여 얻은 RestResponse객체 반환 </returns>
 	private RestResponse? ExecuteResponse(string url)
 	{
 		try
@@ -68,4 +75,39 @@ public class UpBitAPI
 			return null;
 		}
 	}
+
+	/// <summary>
+	/// 업비트에서 거래 가능한 마켓 목록 정보를 호출합니다.
+	/// </summary>
+	/// <returns> 업비트에서 거래 가능한 마켓 목록 정보 </returns>
+	public List<UpBitMarket>? GetUpBitMarkets()
+	{
+		var response = ExecuteResponse(UpBitURL.Market);
+
+		if(response!= null)
+		{ 
+			return JsonConvert.DeserializeObject<List<UpBitMarket>>(response.Content);
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// 업비트에서 현재가 정보를 호출합니다.
+	/// </summary>
+	/// <param name="additionalURL"> 조회할 현재가가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
+	/// <returns> 현재가 정보 목록 </returns>
+	public List<UpBitTicker>? GetUpBitTickers(string additionalURL)
+	{
+		var response = ExecuteResponse(UpBitURL.Ticker + additionalURL);
+
+		if (response != null && response.IsSuccessStatusCode)
+		{
+			return JsonConvert.DeserializeObject<List<UpBitTicker>>(response.Content);
+		}
+
+		return null;
+	}
+
+	#endregion
 }

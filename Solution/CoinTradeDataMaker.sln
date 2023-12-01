@@ -8,7 +8,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinTradeDataMaker", "CoinT
 		{15F9F2D1-4380-4666-916F-66FDC45F22F0} = {15F9F2D1-4380-4666-916F-66FDC45F22F0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinTradeDataMaker.Core", "CoinTradeDataMaker.Core\CoinTradeDataMaker.Core.csproj", "{15F9F2D1-4380-4666-916F-66FDC45F22F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinTradeDataMaker.Core", "CoinTradeDataMaker.Core\CoinTradeDataMaker.Core.csproj", "{15F9F2D1-4380-4666-916F-66FDC45F22F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinTradeDataMaker.Utils", "CoinTradeDataMaker.Utils\CoinTradeDataMaker.Utils.csproj", "{7521C4A5-61F8-4522-9983-EDCE8ED2E892}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{15F9F2D1-4380-4666-916F-66FDC45F22F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15F9F2D1-4380-4666-916F-66FDC45F22F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15F9F2D1-4380-4666-916F-66FDC45F22F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7521C4A5-61F8-4522-9983-EDCE8ED2E892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7521C4A5-61F8-4522-9983-EDCE8ED2E892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7521C4A5-61F8-4522-9983-EDCE8ED2E892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7521C4A5-61F8-4522-9983-EDCE8ED2E892}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
