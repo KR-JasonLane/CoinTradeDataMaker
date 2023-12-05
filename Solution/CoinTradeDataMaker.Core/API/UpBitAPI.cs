@@ -95,7 +95,7 @@ public class UpBitAPI
 	/// <summary>
 	/// 업비트에서 현재가 정보를 호출합니다.
 	/// </summary>
-	/// <param name="additionalURL"> 조회할 현재가가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
+	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
 	/// <returns> 현재가 정보 목록 </returns>
 	public List<UpBitTicker>? GetUpBitTickers(string additionalURL)
 	{
@@ -104,6 +104,23 @@ public class UpBitAPI
 		if (response != null && response.IsSuccessStatusCode)
 		{
 			return JsonConvert.DeserializeObject<List<UpBitTicker>>(response.Content);
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// 업비트에서 호가 정보를 호출합니다.
+	/// </summary>
+	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
+	/// <returns> 호가 정보 목록 </returns>
+	public List<UpBitOrderBook>? GetUpBitOrderBooks(string additionalURL)
+	{
+		var response = ExecuteResponse(UpBitURL.OrderBook  + additionalURL);
+
+		if(response != null && response.IsSuccessStatusCode)
+		{
+			return JsonConvert.DeserializeObject<List<UpBitOrderBook>>(response.Content);
 		}
 
 		return null;

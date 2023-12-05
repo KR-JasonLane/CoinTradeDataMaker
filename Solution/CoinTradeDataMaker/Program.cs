@@ -53,6 +53,12 @@ public class Program
 	/// </summary>
 	private static int MilliSecondForSleep;
 
+	/// <summary>
+	/// 업비트 API 요청 수 제한으로 인한 밀리세컨드 제한
+	/// 테스트 시 60부터 제한되지 않음.
+	/// </summary>
+	private static int LimitedMilliSecond;
+
 	#endregion
 
 	#region Work Method
@@ -100,18 +106,23 @@ public class Program
 	/// </summary>
 	private static void InputMilliSecond()
 	{
+		//사용자에게 입력받을 지연시간 저장
 		MilliSecondForSleep = 0;
 
-		while (MilliSecondForSleep <= 33)
+		//지연시간
+		LimitedMilliSecond = 60;
+
+		//유효한 데이터가 들어올 때 까지 반복
+		while (MilliSecondForSleep <= LimitedMilliSecond)
 		{
 			string message = string.Empty;
-			message += "예측값 간격 설정 \n\n";
-			message += "업비트 API 정책 상 초당 30회 이상 조회요청을 할 수 없습니다.\n";
-			message += "34 밀리세컨드 이상의 값을 입력해 주세요. (1초 = 1000ms)";
+			message += "지연시간 설정 \n\n";
+			message += "업비트 API 정책 상 연속적으로 조회요청을 할 수 없어 지연시간 설정이 필요합니다.\n";
+			message += $"{LimitedMilliSecond} 밀리세컨드 이상의 값을 입력해 주세요. (1초 = 1000ms)";
 
 			WriteHeaderLog(message);
 
-			Console.Write("예측값 간격 (단위 : ms) : ");
+			Console.Write("예측값 지연시간 (단위 : ms) : ");
 
 			try		{ MilliSecondForSleep = int.Parse(Console.ReadLine()); }
 			catch	{ continue; }
@@ -149,6 +160,9 @@ public class Program
 			return;
 		}
 
+		//1초 쉬어서 요청횟수 초기화
+		Thread.Sleep(MilliSecondForSleep);
+		
 		//반복작업 시작
 		while (IsContinueWork == true)
 		{
