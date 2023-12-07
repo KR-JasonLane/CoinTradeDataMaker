@@ -14,34 +14,33 @@ public class FileHelper
 	#region Properties
 
 	/// <summary>
-	/// 어플리케이션 실행 지점에 존재하는 폴더 이름입니다.
+	/// 어플리케이션 실행 지점에 존재하는 폴더 이름
 	/// </summary>
 	private string FolderName;
 
 	/// <summary>
-	/// 어플리케이션 실행지점에 존재하는 하위폴더 내 파일 이름입니다.
+	/// 어플리케이션 실행지점에 존재하는 하위폴더 내 파일 이름
 	/// </summary>
 	private string FileName;
 
 	/// <summary>
-	/// 폴더의 주소값입니다.
+	/// 폴더의 경로
 	/// </summary>
 	private string FolderPath;
 
 	/// <summary>
-	/// 파일의 주소값입니다.
+	/// 파일의 경로
 	/// </summary>
-	private string FilePath;
+	public string FilePath { get; init; }
 
 	#endregion
-
 	#region Work Method
 
 	/// <summary>
 	/// 폴더가 생성되어 있는지 여부를 확인하고,
-	/// 폴더가 존재하지 않으면 생성을 시도합니다.
+	/// 폴더가 존재하지 않으면 생성을 시도
 	/// </summary>
-	/// <returns> 폴더의 존재여부를 반환합니다. </returns>
+	/// <returns> 폴더의 존재여부를 반환 </returns>
 	public bool IsFolderReady()
 	{
 		DirectoryInfo directoryInfo = new DirectoryInfo(FolderPath);
@@ -65,31 +64,11 @@ public class FileHelper
 	}
 
 	/// <summary>
-	/// 파일이 생성되어 있는지 여부를 확인하고,
-	/// 파일이 존재하지 않으면 생성을 시도합니다.
+	/// 파일이 존재하는지 확인 후 파일이 없으면 생성
 	/// </summary>
-	/// <returns>파일의 존재 여부를 반환합니다. </returns>
-	public bool IsFileReady()
-	{
-		if (File.Exists(FilePath) == false)
-		{
-			try
-			{
-				using (File.Create(FilePath))
-				{
-					return true;
-				}
-			}
-			catch
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return true;
-		}
-	}
+	/// <param name="defaultString"> 파일을 생성하면서 기본적으로 입력 할 문자열 </param>
+	/// <returns> 파일생성 결과 </returns>
+	public bool IsFileReady() => File.Exists(FilePath);
 
 	#endregion
 }

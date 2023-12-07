@@ -28,7 +28,7 @@ public class UpBitAPI
 	#region API Method
 
 	/// <summary>
-	/// Upbit 서버와의 연결이 유효한지 검사합니다.
+	/// Upbit 서버와의 연결이 유효한지 검사
 	/// </summary>
 	/// <returns> 연결시도 후 결과 반환 </returns>
 	public bool ConnectionTest()
@@ -38,7 +38,7 @@ public class UpBitAPI
 	}
 
 	/// <summary>
-	/// URL을 사용하여 필요한 정보를 담은 객체를 가져옵니다.
+	/// URL을 사용하여 필요한 정보를 담은 객체를 가져온다.
 	/// </summary>
 	/// <param name="url"> API 접속 URL </param>
 	/// <returns> 서버와 통신하여 얻은 RestResponse객체 반환 </returns>
@@ -77,50 +77,71 @@ public class UpBitAPI
 	}
 
 	/// <summary>
-	/// 업비트에서 거래 가능한 마켓 목록 정보를 호출합니다.
+	/// 업비트에서 거래 가능한 마켓 목록 정보를 호출
 	/// </summary>
 	/// <returns> 업비트에서 거래 가능한 마켓 목록 정보 </returns>
 	public List<UpBitMarket>? GetUpBitMarkets()
 	{
-		var response = ExecuteResponse(UpBitURL.Market);
+		try
+		{
+			var response = ExecuteResponse(UpBitURL.Market);
 
-		if(response!= null)
-		{ 
-			return JsonConvert.DeserializeObject<List<UpBitMarket>>(response.Content);
+			if (response != null)
+			{
+				return JsonConvert.DeserializeObject<List<UpBitMarket>>(response.Content);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new Exception(e.Message);
 		}
 
 		return null;
 	}
 
 	/// <summary>
-	/// 업비트에서 현재가 정보를 호출합니다.
+	/// 업비트에서 현재가 정보를 호출
 	/// </summary>
-	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
+	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 ex)KRW-BTC,KRW-SOL </param>
 	/// <returns> 현재가 정보 목록 </returns>
 	public List<UpBitTicker>? GetUpBitTickers(string additionalURL)
 	{
-		var response = ExecuteResponse(UpBitURL.Ticker + additionalURL);
-
-		if (response != null && response.IsSuccessStatusCode)
+		try
 		{
-			return JsonConvert.DeserializeObject<List<UpBitTicker>>(response.Content);
+			var response = ExecuteResponse(UpBitURL.Ticker + additionalURL);
+
+			if (response != null && response.IsSuccessStatusCode)
+			{
+				return JsonConvert.DeserializeObject<List<UpBitTicker>>(response.Content);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new Exception(e.Message);
 		}
 
 		return null;
 	}
 
 	/// <summary>
-	/// 업비트에서 호가 정보를 호출합니다.
+	/// 업비트에서 호가 정보를 호출
 	/// </summary>
-	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 입니다. ex)KRW-BTC,KRW-SOL </param>
+	/// <param name="additionalURL"> 조회할 마켓코드가 쉼표로 구분되어있는 문자열 ex)KRW-BTC,KRW-SOL </param>
 	/// <returns> 호가 정보 목록 </returns>
 	public List<UpBitOrderBook>? GetUpBitOrderBooks(string additionalURL)
 	{
-		var response = ExecuteResponse(UpBitURL.OrderBook  + additionalURL);
-
-		if(response != null && response.IsSuccessStatusCode)
+		try
 		{
-			return JsonConvert.DeserializeObject<List<UpBitOrderBook>>(response.Content);
+			var response = ExecuteResponse(UpBitURL.OrderBook + additionalURL);
+
+			if (response != null && response.IsSuccessStatusCode)
+			{
+				return JsonConvert.DeserializeObject<List<UpBitOrderBook>>(response.Content);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new Exception(e.Message);
 		}
 
 		return null;

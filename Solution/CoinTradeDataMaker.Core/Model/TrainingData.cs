@@ -1,26 +1,39 @@
 ﻿namespace CoinTradeDataMaker.Core.Model;
 
-public class UpBitTicker
+public class TrainingData
 {
-	/* [change], [change_price], [change_rate], [signed_change_price], [signed_change_rate] 필드들은 전일종가 대비 값 */
+	///////////////////////////////////////////////
+	// 기본 정보
+	///////////////////////////////////////////////
+	
 
 	/// <summary>
-	/// 종목 구분 코드
+	/// 업비트에서 제공중인 시장 정보
 	/// </summary>
 	public string market { get; set; }
 
-	/// <summary>
-	/// 최근 거래 일자 (UTC)
-	/// 포맷 : yyyyMMdd
+
+	///////////////////////////////////////////////
+	// 대장코인 가격 (BTC, ETH)
+	///////////////////////////////////////////////
+	
+	
+	/// <summary> 
+	/// 비트코인(BTC) 가격
 	/// </summary>
-	public string trade_date { get; set; }
+	public double btc_trade_price { get; set; }
 
 	/// <summary>
-	/// 최근 거래 시각(UTC)
-	/// 포맷 : HHmmss
+	/// 이더리움(ETH) 가격
 	/// </summary>
-	public string trade_time { get; set; }
+	public double eth_trade_price { get; set; }
 
+
+	///////////////////////////////////////////////
+	// 과거 현재가 정보
+	///////////////////////////////////////////////
+	
+	
 	/// <summary>
 	/// 최근 거래 일자(KST)
 	/// 포맷 : yyyyMMdd
@@ -32,12 +45,6 @@ public class UpBitTicker
 	/// 포맷 : HHmmss
 	/// </summary>
 	public string trade_time_kst { get; set; }
-
-	/// <summary>
-	/// 최근 거래 일시(UTC)
-	/// 포맷 : Unix Timestamp
-	/// </summary>
-	public long trade_timestampe { get; set; }
 
 	/// <summary>
 	/// 시가
@@ -67,7 +74,7 @@ public class UpBitTicker
 	/// <summary>
 	/// EVEN : 보합 / RISE : 상승 / FALL : 하락
 	/// </summary>
-	public string change {  get; set; }
+	public string change { get; set; }
 
 	/// <summary>
 	/// 변화액의 절대값
@@ -136,8 +143,14 @@ public class UpBitTicker
 	/// </summary>
 	public string lowest_52_week_date { get; set; }
 
+
+	///////////////////////////////////////////////
+	// 결과
+	///////////////////////////////////////////////
+	
+
 	/// <summary>
-	/// 타임스태프
+	/// 결과 (예측 데이터)
 	/// </summary>
-	public long timestamp { get; set; }
+	public double result { get; set; }
 }

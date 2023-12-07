@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoinTradeDataMaker.Core\CoinTradeDataMaker.Core.csproj" />
+    <ProjectReference Include="..\CoinTradeDataMaker.DataBase\CoinTradeDataMaker.DataBase.csproj" />
     <ProjectReference Include="..\CoinTradeDataMaker.Utils\CoinTradeDataMaker.Utils.csproj" />
   </ItemGroup>
 
