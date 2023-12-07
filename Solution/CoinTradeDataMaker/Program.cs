@@ -151,7 +151,6 @@ public class Program
 		{
 			string createQuery = string.Empty;
 			createQuery += $"CREATE TABLE {DBTableName}(";
-			createQuery += "current_time TEXT,";
 			createQuery += "market TEXT,";
 			createQuery += "btc_trade_price TEXT,";
 			createQuery += "eth_trade_price TEXT,";
