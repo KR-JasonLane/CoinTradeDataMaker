@@ -14,7 +14,7 @@ public class TrainingData
 
 
 	///////////////////////////////////////////////
-	// 대장코인 가격 (BTC, ETH)
+	// 대장코인 정보 (BTC, ETH)
 	///////////////////////////////////////////////
 	
 	
@@ -24,16 +24,56 @@ public class TrainingData
 	public double btc_trade_price { get; set; }
 
 	/// <summary>
+	/// 비트코인 변화정보(EVEN, RISE, FALL)
+	/// </summary>
+	public string btc_change { get; set; }
+
+	/// <summary>
+	/// 비트코인 부호가 있는 변화액
+	/// </summary>
+	public double btc_signed_change_price { get; set; }
+
+	/// <summary>
+	/// 비트코인 부호가 있는 변화율
+	/// </summary>
+	public double btc_signed_change_rate { get; set; }
+
+	/// <summary>
+	/// 비트코인 가장 최근 거래량
+	/// </summary>
+	public double btc_trade_volume { get; set; }
+
+	/// <summary>
 	/// 이더리움(ETH) 가격
 	/// </summary>
 	public double eth_trade_price { get; set; }
+
+	/// <summary>
+	/// 이더리움 변화정보 (EVEN, RISE, FALL)
+	/// </summary>
+	public string eth_change { get; set; }
+
+	/// <summary>
+	/// 이더리움 부호가 있는 변화액
+	/// </summary>
+	public double eth_signed_change_price { get; set; }
+
+	/// <summary>
+	/// 이더리움 부호가 있는 변화율
+	/// </summary>
+	public double eth_signed_change_rate { get; set; }
+
+	/// <summary>
+	/// 이더리움 가장 최근 거래량
+	/// </summary>
+	public double eth_trade_volume { get; set; }
 
 
 	///////////////////////////////////////////////
 	// 과거 현재가 정보
 	///////////////////////////////////////////////
-	
-	
+
+
 	/// <summary>
 	/// 최근 거래 일자(KST)
 	/// 포맷 : yyyyMMdd
@@ -120,28 +160,6 @@ public class TrainingData
 	/// 24시간 누적 거래량
 	/// </summary>
 	public double acc_trade_volume_24h { get; set; }
-
-	/// <summary>
-	/// 52주 신고가
-	/// </summary>
-	public double highest_52_week_price { get; set; }
-
-	/// <summary>
-	/// 52주 신고가 달성일
-	/// 포맷 : yyyy-MM-dd
-	/// </summary>
-	public string highest_52_week_date { get; set; }
-
-	/// <summary>
-	/// 52주 신저가
-	/// </summary>
-	public double lowest_52_week_price { get; set; }
-
-	/// <summary>
-	/// 52주 신저가 달성일
-	/// 포맷 : yyyy-MM-dd
-	/// </summary>
-	public string lowest_52_week_date { get; set; }
 
 
 	///////////////////////////////////////////////

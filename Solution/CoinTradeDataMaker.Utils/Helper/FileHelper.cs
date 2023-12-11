@@ -34,7 +34,7 @@ public class FileHelper
 	public string FilePath { get; init; }
 
 	#endregion
-	#region Work Method
+	#region Methods
 
 	/// <summary>
 	/// 폴더가 생성되어 있는지 여부를 확인하고,
@@ -64,9 +64,8 @@ public class FileHelper
 	}
 
 	/// <summary>
-	/// 파일이 존재하는지 확인 후 파일이 없으면 생성
+	/// 파일이 존재하는지 확인 후 여부 반환
 	/// </summary>
-	/// <param name="defaultString"> 파일을 생성하면서 기본적으로 입력 할 문자열 </param>
 	/// <returns> 파일생성 결과 </returns>
 	public bool IsFileReady() => File.Exists(FilePath);
 

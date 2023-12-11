@@ -22,8 +22,13 @@ public class DataBaseManager
 	/// </summary>
 	private string ConnectString;
 
+	/// <summary>
+	/// 데이터베이스에 접근할 수 있는 객체
+	/// </summary>
+	private SQLiteConnection Connection;
+
 	#endregion
-	#region Work Method
+	#region Methods
 
 	/// <summary>
 	/// .db파일을 만듭니다.
@@ -34,15 +39,14 @@ public class DataBaseManager
 	{
 		try
 		{
-			var connect = new SQLiteConnection(ConnectString);
-			connect.Open();
+			Connection = new SQLiteConnection(ConnectString);
+			Connection.Open();
 
 			if (string.IsNullOrEmpty(command) == false)
 			{
-				var cmd = new SQLiteCommand(command, connect);
+				var cmd = new SQLiteCommand(command, Connection);
 				cmd.ExecuteNonQuery();
 			}
-			connect.Close();
 		}
 		catch (Exception ex)
 		{
@@ -82,13 +86,8 @@ public class DataBaseManager
 				else query += ")";
 			}
 
-			var connect = new SQLiteConnection(ConnectString);
-			connect.Open();
-
-			var command = new SQLiteCommand(query, connect);
+			var command = new SQLiteCommand(query, Connection);
 			command.ExecuteNonQuery();
-
-			connect.Close();
 		}
 		catch (Exception ex)
 		{

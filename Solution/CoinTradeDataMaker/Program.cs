@@ -2,10 +2,8 @@
 
 using CoinTradeDataMaker.Core.API;
 using CoinTradeDataMaker.Core.Model;
-using CoinTradeDataMaker.DataBase;
+
 using System.Diagnostics;
-using Newtonsoft.Json;
-using System.Runtime.CompilerServices;
 
 namespace CoinTradeDataMaker;
 
@@ -16,9 +14,6 @@ public class Program
 	/// </summary>
 	public static void Main()
 	{
-		DBTableName = "TrainingDataTable";
-		LossDataCount = 0;
-
 		//키 입력 받아서 API 객체 생성하기
 		InPutKeyAndCreateAPIObject();
 
@@ -42,23 +37,13 @@ public class Program
 	private static int MilliSecondForSleep;
 
 	/// <summary>
-	/// 결과데이터를 저장할 데이터베이스 매니저
+	/// 학습 데이터를 저장해 줄 객체
 	/// </summary>
-	private static DataBaseManager? DB;
-
-	/// <summary>
-	/// 데이터베이스에서 참조하는 테이블 이름을 기억
-	/// </summary>
-	private static string DBTableName;
-
-	/// <summary>
-	/// 손실데이터 갯수를 나타냄
-	/// </summary>
-	private static int LossDataCount;
+	private static CsvFileHelper? CsvFileHelper;
 
 	#endregion
 
-	#region Work Method
+	#region Methods
 
 	/// <summary>
 	/// 사용자에게 발급받은 API키를 입력받고, 유효한 UpBitAPI객체를 생성
@@ -133,8 +118,12 @@ public class Program
 		//현재가 조회에 사용할 URL의 추가부분을 만든다.
 		string additionalTickerUrl = MakeAdditionalTickerURL();
 
+		string folderName = "Output";
+		string fileName = "TrainingData.csv";
+
 		//파일 관리객체 생성
-		FileHelper fileHelper = new FileHelper("Output", "TrainingData.db");
+		FileHelper fileHelper = new FileHelper(folderName, fileName);
+		CsvFileHelper = new CsvFileHelper(folderName, fileName);
 
 		//폴더 준비상태 확인
 		if (fileHelper.IsFolderReady() == false)
@@ -143,47 +132,42 @@ public class Program
 			return;
 		}
 
-		//데이터베이스 매니저 준비
-		DB = new DataBaseManager(fileHelper.FilePath);
 
 		//결과 파일 준비상태 확인
 		if (fileHelper.IsFileReady() == false)
 		{
-			string createQuery = string.Empty;
-			createQuery += $"CREATE TABLE {DBTableName}(";
-			createQuery += "market TEXT,";
-			createQuery += "btc_trade_price TEXT,";
-			createQuery += "eth_trade_price TEXT,";
-			createQuery += "trade_date_kst TEXT,";
-			createQuery += "trade_time_kst TEXT,";
-			createQuery += "opening_price TEXT,";
-			createQuery += "high_price TEXT,";
-			createQuery += "low_price TEXT,";
-			createQuery += "trade_price TEXT,";
-			createQuery += "prev_closing_price TEXT,";
-			createQuery += "change TEXT,";
-			createQuery += "change_price TEXT,";
-			createQuery += "change_rate TEXT,";
-			createQuery += "signed_change_price TEXT,";
-			createQuery += "signed_change_rate TEXT,";
-			createQuery += "trade_volume TEXT,";
-			createQuery += "acc_trade_price TEXT,";
-			createQuery += "acc_trade_price_24h TEXT,";
-			createQuery += "acc_trade_volume TEXT,";
-			createQuery += "acc_trade_volume_24h TEXT,";
-			createQuery += "highst_52_week_price TEXT,";
-			createQuery += "highst_52_week_date TEXT,";
-			createQuery += "lowest_52_week_price TEXT,";
-			createQuery += "lowest_52_week_date TEXT,";
-			createQuery += "result TEXT)";
-
-			//DB파일 생성
-			try { DB.CreateDataBase(createQuery); }
-			catch
-			{
-				WriteErrorLog("Error : 데이터베이스 파일 생성 실패");
-				return;
-			}
+			CsvFileHelper.Write
+			(
+				"market",
+				"btc_trade_price",
+				"btc_change",
+				"btc_signed_change_price",
+				"btc_signed_change_rate",
+				"btc_trade_volumn",
+				"eth_trade_price",
+				"eth_change",
+				"eth_signed_change_price",
+				"eth_signed_change_rate",
+				"eth_trade_volumn",
+				"trade_date_kst",
+				"trade_time_kst",
+				"opening_price",
+				"high_price",
+				"low_price",
+				"trade_price",
+				"prev_closing_price",
+				"change",
+				"change_price",
+				"change_rate",
+				"signed_change_price",
+				"signed_change_rate",
+				"trade_volume",
+				"acc_trade_price",
+				"acc_trade_price_24h",
+				"acc_trade_volume",
+				"acc_trade_volume_24h",
+				"result"
+			);
 		}
 
 		//과거 데이터
@@ -226,7 +210,7 @@ public class Program
 			}
 
 			//쓰레드풀에 데이터 쓰기 작업 등록
-			ThreadPool.QueueUserWorkItem((callback) => AddTrainingData(curTickers, oldTickers));
+			ThreadPool.QueueUserWorkItem((callback) => WriteTrainingData(curTickers, oldTickers));
 
 			//시스템 지연시간 측정
 			stopwatch.Stop();
@@ -239,7 +223,6 @@ public class Program
 			message += $" - 설정 지연시간 : {MilliSecondForSleep}ms\n";
 			message += $" - 시스템 지연시간 : {stopwatch.ElapsedMilliseconds}ms\n\n";
 			message += $" * 총 지연시간 : {MilliSecondForSleep + stopwatch.ElapsedMilliseconds}ms\n";
-			message += $" * 총 손실데이터 : {LossDataCount}개";
 
 			WriteNormalLog(message);
 		}
@@ -249,76 +232,55 @@ public class Program
 	/// 데이터베이스에 데이터 입력
 	/// </summary>
 	/// <param name="trainingData"> 값을 추출해 내기 위한 TrainingData객체 </param>
-	private static void InputDataInDB(TrainingData trainingData)
+	private static void InputDataInCsvFile(List<TrainingData> trainingDatas)
 	{
-		List<string> columns = new List<string>()
-		{
-			"market",
-			"btc_trade_price",
-			"eth_trade_price",
-			"trade_date_kst",
-			"trade_time_kst",
-			"opening_price",
-			"high_price",
-			"low_price",
-			"trade_price",
-			"prev_closing_price",
-			"change",
-			"change_price",
-			"change_rate",
-			"signed_change_price",
-			"signed_change_rate",
-			"trade_volume",
-			"acc_trade_price",
-			"acc_trade_price_24h",
-			"acc_trade_volume",
-			"acc_trade_volume_24h",
-			"highst_52_week_price",
-			"highst_52_week_date",
-			"lowest_52_week_price",
-			"lowest_52_week_date",
-			"result",
-		};
 
-		List<string> values = new List<string>()
-		{ 		
-			$"{trainingData.market}",
-			$"{trainingData.btc_trade_price}",
-			$"{trainingData.eth_trade_price}",
-			$"{trainingData.trade_date_kst}",
-			$"{trainingData.trade_time_kst}",
-			$"{trainingData.opening_price}",
-			$"{trainingData.high_price}",
-			$"{trainingData.low_price}",
-			$"{trainingData.trade_price}",
-			$"{trainingData.prev_closing_price}",
-			$"{trainingData.change}",
-			$"{trainingData.change_price}",
-			$"{trainingData.change_rate}",
-			$"{trainingData.signed_change_price}",
-			$"{trainingData.signed_change_rate}",
-			$"{trainingData.trade_volume}",
-			$"{trainingData.acc_trade_price}",
-			$"{trainingData.acc_trade_price_24h}",
-			$"{trainingData.acc_trade_volume}",
-			$"{trainingData.acc_trade_volume_24h}",
-			$"{trainingData.highest_52_week_price}",
-			$"{trainingData.highest_52_week_date}",
-			$"{trainingData.lowest_52_week_price}",
-			$"{trainingData.lowest_52_week_date}",
-			$"{trainingData.result}"
-		};
+		List<List<string>> rows = new();
 
-		try
+		foreach (TrainingData trainingData in trainingDatas)
 		{
-			DB!.Insert(DBTableName, columns, values);
+
+			try 
+			{ 
+				CsvFileHelper.Write
+				(
+					$"{trainingData.market}",
+					$"{trainingData.btc_trade_price}",
+					$"{trainingData.btc_change}",
+					$"{trainingData.btc_signed_change_price}",
+					$"{trainingData.btc_signed_change_rate}",
+					$"{trainingData.btc_trade_volume}",
+					$"{trainingData.eth_trade_price}",
+					$"{trainingData.eth_change}",
+					$"{trainingData.eth_signed_change_price}",
+					$"{trainingData.eth_signed_change_rate}",
+					$"{trainingData.eth_trade_volume}",
+					$"{trainingData.trade_date_kst}",
+					$"{trainingData.trade_time_kst}",
+					$"{trainingData.opening_price}",
+					$"{trainingData.high_price}",
+					$"{trainingData.low_price}",
+					$"{trainingData.trade_price}",
+					$"{trainingData.prev_closing_price}",
+					$"{trainingData.change}",
+					$"{trainingData.change_price}",
+					$"{trainingData.change_rate}",
+					$"{trainingData.signed_change_price}",
+					$"{trainingData.signed_change_rate}",
+					$"{trainingData.trade_volume}",
+					$"{trainingData.acc_trade_price}",
+					$"{trainingData.acc_trade_price_24h}",
+					$"{trainingData.acc_trade_volume}",
+					$"{trainingData.acc_trade_volume_24h}",
+					$"{trainingData.result}"
+				); 
+			}
+			catch (Exception e) 
+			{ 
+				WriteErrorLog($"Error : {e.Message}"); 
+			}
 		}
-		catch (Exception e)
-		{
-			WriteErrorLog($"{trainingData.market}데이터 손실!\n에러로그 : {e.Message}");
-			LossDataCount++;
-		}
-		
+
 	}
 
 	/// <summary>
@@ -326,19 +288,29 @@ public class Program
 	/// </summary>
 	/// <param name="curTickers"> 최신 현재가 정보 </param>
 	/// <param name="oldTickers"> 이전 현재가 정보 </param>
-	private static void AddTrainingData(List<UpBitTicker> curTickers, List<UpBitTicker> oldTickers)
+	private static void WriteTrainingData(List<UpBitTicker> curTickers, List<UpBitTicker> oldTickers)
 	{
-		//비트코인, 이더리움 가격을 추출
-		double btc_trade_price = oldTickers.Find(x => x.market == "KRW-BTC")!.trade_price;
-		double eth_trade_price = oldTickers.Find(x => x.market == "KRW-ETH")!.trade_price;
+		//비트코인, 이더리움 정보 추출
+		UpBitTicker? btcTicker = oldTickers.Find(x => x.market == "KRW-BTC");
+		UpBitTicker? ethTicker = oldTickers.Find(x => x.market == "KRW-ETH");
+
+		List<TrainingData> datas = new List<TrainingData>();
 
 		for (int i = 0; i < curTickers.Count; i++)
 		{
 			TrainingData curData = new TrainingData()
 			{
 				market					=	oldTickers[i].market,
-				btc_trade_price			=	btc_trade_price,
-				eth_trade_price			=	eth_trade_price,
+				btc_trade_price			=	btcTicker!.trade_price,
+				btc_change				=	btcTicker!.change,
+				btc_signed_change_price	=	btcTicker!.signed_change_price,
+				btc_signed_change_rate	=	btcTicker!.signed_change_rate,
+				btc_trade_volume		=	btcTicker!.trade_volume,
+				eth_trade_price			=	ethTicker!.trade_price,
+				eth_change				=	ethTicker!.change,
+				eth_signed_change_price	=	ethTicker!.signed_change_price,
+				eth_signed_change_rate	=	ethTicker!.signed_change_rate,
+				eth_trade_volume		=	ethTicker!.trade_volume,
 				trade_date_kst			=	oldTickers[i].trade_date_kst,
 				trade_time_kst			=	oldTickers[i].trade_time_kst,
 				opening_price			=	oldTickers[i].opening_price,
@@ -356,15 +328,11 @@ public class Program
 				acc_trade_price_24h		=	oldTickers[i].acc_trade_price_24h,
 				acc_trade_volume		=	oldTickers[i].acc_trade_volume,
 				acc_trade_volume_24h	=	oldTickers[i].acc_trade_volume_24h,
-				highest_52_week_price	=	oldTickers[i].highest_52_week_price,
-				highest_52_week_date	=	oldTickers[i].highest_52_week_date,
-				lowest_52_week_price	=	oldTickers[i].lowest_52_week_price,
-				lowest_52_week_date		=	oldTickers[i].lowest_52_week_date,
 				result					=	curTickers[i].trade_price
 			};
-
-			InputDataInDB(curData);
+			datas.Add(curData);
 		}
+		InputDataInCsvFile(datas);
 
 	}
 
